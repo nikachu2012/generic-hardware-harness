@@ -1,7 +1,7 @@
 [project]
-name = "switch2-harness"
+name = "generic-hardware-harness"
 version = "0.1.0"
-description = "Drive a Nintendo Switch 2 via an ESP32-S3 USB gamepad bridge and watch it via a capture card"
+description = "Drive a USB-HID host device (console, PC, ...) via an ESP32-S3 gamepad/keyboard/mouse bridge and watch it via a capture card"
 requires-python = ">=3.11"
 dependencies = [
     "pyserial>=3.5",
@@ -11,9 +11,12 @@ dependencies = [
 ]
 
 [project.scripts]
-s2h = "switch2_harness.cli:main"
-s2h-mcp = "switch2_harness.mcp_server:main"
+hwh = "hardware_harness.cli:main"
+hwh-mcp = "hardware_harness.mcp_server:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["hardware_harness"]

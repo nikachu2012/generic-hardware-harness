@@ -1,4 +1,4 @@
-"""MCP server: lets an AI agent see the Switch 2 screen and press buttons."""
+"""MCP server: lets an AI agent see the target device's screen and press buttons."""
 
 from __future__ import annotations
 
@@ -16,18 +16,18 @@ from .capture import Capture
 from .controller import BUTTONS, HAT, Controller
 
 mcp = FastMCP(
-    "switch2",
+    "hardware",
     instructions=(
-        "Controls a Nintendo Switch 2 through a USB gamepad emulator and shows its screen via a "
+        "Controls a USB-HID host device (game console, PC, ...) through a USB gamepad emulator and shows its screen via a "
         "capture card. Inputs: buttons " + ", ".join(BUTTONS) + "; d-pad " + ", ".join(HAT) +
         ". Stick y is +1 = down. Most action tools return a screenshot taken after the action; "
         "look at it before deciding the next input. The bridge is one USB device at a time: "
         "mode 'pad' (gamepad: press / tilt_stick / hold), 'keyboard' (type_text / key) or "
         "'mouse' (mouse_*). Use set_mode to switch; it takes ~2 s and looks like an unplug/replug "
-        "to the Switch. For text, open the on-screen keyboard with the gamepad first, then switch "
+        "to the device. For text, open the on-screen keyboard with the gamepad first, then switch "
         "to 'keyboard' and type (romaji becomes kana when the on-screen keyboard is in kana mode); "
         "switch back to 'pad' afterwards. The mouse only works in games that support it. "
-        "Mode 'kbm' (both) is NOT recognized by the Switch 2."
+        "Mode 'kbm' (both) is not recognized by some devices (e.g. Nintendo Switch 2)."
     ),
 )
 
@@ -99,7 +99,7 @@ def _result(msg: str, wait_ms: int, screenshot: bool, width: int):
 @mcp.tool()
 @_logged
 def screenshot(width: int = 1280) -> Image:
-    """Return the current Switch 2 screen as JPEG (resized to `width` px, full res is 1920)."""
+    """Return the current screen of the target device as JPEG (resized to `width` px, full res is 1920)."""
     return _shot(width)
 
 
@@ -172,8 +172,8 @@ def macro(script: str, wait_ms: int = 300, screenshot: bool = True, width: int =
 @mcp.tool()
 @_logged
 def set_mode(mode: str, wait_ms: int = 1500, screenshot: bool = True, width: int = 1280):
-    """Switch the USB device the Switch sees: "pad" (gamepad), "keyboard" or "mouse".
-    ("kbm" = keyboard + mouse in one device exists but the Switch 2 doesn't recognize it.)"""
+    """Switch the USB device the target sees: "pad" (gamepad), "keyboard" or "mouse".
+    ("kbm" = keyboard + mouse in one device exists but some devices (e.g. Switch 2) don't recognize it.)"""
     st = ctl().set_mode(mode)
     return _result(f"mode {ctl().mode} {st}", wait_ms, screenshot, width)
 
@@ -238,18 +238,18 @@ def mouse_scroll(clicks: int, wait_ms: int = 300, screenshot: bool = True, width
 @mcp.tool()
 @_logged
 def status() -> dict:
-    """Bridge status: mounted=1 means the Switch has enumerated the device;
+    """Bridge status: mounted=1 means the target has enumerated the device;
     mode 0=pad, 1=kbm, 2=keyboard, 3=mouse."""
     return ctl().status()
 
 
 def main() -> None:
-    port = int(os.environ.get("S2H_VIEW_PORT", "8765"))
+    port = int(os.environ.get("HWH_VIEW_PORT", "8765"))
     if port:
         try:
             viewer.start(port, lambda: cap().jpeg(width=960, quality=70, fresh=False), _view_state)
         except OSError as e:
-            print(f"switch2 live view disabled: {e}", file=sys.stderr)
+            print(f"hardware-harness live view disabled: {e}", file=sys.stderr)
     mcp.run()
 
 

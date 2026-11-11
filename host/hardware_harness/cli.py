@@ -1,4 +1,4 @@
-"""Command line entry point: `s2h <command>`."""
+"""Command line entry point: `hwh <command>`."""
 
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ def _viewer(args) -> None:
               "ijkl=L stick  p=save screenshot  Esc=quit")
         while True:
             f = cap.frame()
-            cv2.imshow("Switch 2", cv2.resize(f, (1280, 720)))
+            cv2.imshow("Hardware Harness", cv2.resize(f, (1280, 720)))
             k = cv2.waitKeyEx(15)
             if k == -1:
                 continue
@@ -47,13 +47,13 @@ def _viewer(args) -> None:
 
 
 def main() -> None:
-    p = argparse.ArgumentParser(prog="s2h", description="Switch 2 harness")
-    p.add_argument("--port", help="ESP32 serial port (env S2H_PORT)")
-    p.add_argument("--camera", help="capture device name or index (env S2H_CAMERA, default 'USB Video')")
+    p = argparse.ArgumentParser(prog="hwh", description="Generic hardware harness")
+    p.add_argument("--port", help="ESP32 serial port (env HWH_PORT)")
+    p.add_argument("--camera", help="capture device name or index (env HWH_CAMERA, default 'USB Video')")
     sub = p.add_subparsers(dest="cmd", required=True)
 
     sub.add_parser("status", help="bridge status")
-    sp = sub.add_parser("press", help="press inputs, e.g. `s2h press A` or `s2h press L+R -d 200`")
+    sp = sub.add_parser("press", help="press inputs, e.g. `hwh press A` or `hwh press L+R -d 200`")
     sp.add_argument("inputs")
     sp.add_argument("-d", "--duration", type=int, default=100, help="ms")
     sm = sub.add_parser("macro", help="run a macro script (string or @file)")

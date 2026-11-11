@@ -47,7 +47,7 @@ def list_v4l2_devices() -> list[tuple[int, str]]:
 
 
 def list_devices() -> list[tuple[int, str]]:
-    """(index, name) of capture devices usable with `S2H_CAMERA`."""
+    """(index, name) of capture devices usable with `HWH_CAMERA`."""
     if sys.platform == "darwin":
         return list(enumerate(list_avfoundation_devices()))
     if sys.platform.startswith("linux"):
@@ -57,7 +57,7 @@ def list_devices() -> list[tuple[int, str]]:
 
 def resolve_device(device: str | int | None) -> int:
     if device is None:
-        device = os.environ.get("S2H_CAMERA", "USB Video")
+        device = os.environ.get("HWH_CAMERA", "USB Video")
     if isinstance(device, int) or str(device).isdigit():
         return int(device)
     devices = list_devices()
@@ -71,7 +71,7 @@ def resolve_device(device: str | int | None) -> int:
         if device.lower() in n.lower():
             return i
     raise RuntimeError(f"capture device {device!r} not found; available: {devices} "
-                       "(set S2H_CAMERA to a name or index)")
+                       "(set HWH_CAMERA to a name or index)")
 
 
 class Capture:

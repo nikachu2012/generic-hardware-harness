@@ -1,8 +1,8 @@
 {
   "mcpServers": {
-    "switch2": {
+    "hardware": {
       "command": "uv",
-      "args": ["run", "--project", "host", "s2h-mcp"]
+      "args": ["run", "--project", "host", "hwh-mcp"]
     }
   }
 }

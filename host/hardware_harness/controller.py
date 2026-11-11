@@ -91,7 +91,7 @@ _BRIDGE_VIDS = {0x1A86, 0x10C4, 0x0403, 0x303A}
 
 
 def find_port() -> str:
-    env = os.environ.get("S2H_PORT")
+    env = os.environ.get("HWH_PORT")
     if env:
         return env
     try:
@@ -108,7 +108,7 @@ def find_port() -> str:
         found = sorted(glob.glob(pat))
         if found:
             return found[0]
-    raise RuntimeError("ESP32 serial port not found; set S2H_PORT or pass --port")
+    raise RuntimeError("ESP32 serial port not found; set HWH_PORT or pass --port")
 
 
 class NotMountedError(RuntimeError):
@@ -141,7 +141,7 @@ class Controller:
         # A second process on the same port would steal replies; fail loudly instead.
         s.exclusive = True
         # Leave DTR/RTS at their default (both asserted): the auto-reset circuit only
-        # fires when they differ, and a reset would unplug the controller from the Switch.
+        # fires when they differ, and a reset would unplug the controller from the target device.
         s.open()
         self._ser = s
         time.sleep(0.05)
@@ -223,9 +223,9 @@ class Controller:
         hint = ("the bridge re-plugs USB every 5 s on its own (replugs=%d so far)" % st["replugs"]
                 if "replugs" in st else "update the firmware for automatic USB re-plug")
         raise NotMountedError(
-            f"the Switch is not talking to the controller (mounted=0, mode={self.mode}); {hint}. "
+            f"the target device is not talking to the controller (mounted=0, mode={self.mode}); {hint}. "
             "Restarting the MCP server or sending signals does not help. If it persists, reseat "
-            "the ESP32's native-USB cable on the Switch side or restart the console.")
+            "the ESP32's native-USB cable on the device side or restart the device.")
 
     def _cmd(self, line: str, retry: bool = True) -> str:
         """Send a command; on a dead port or missing reply, reconnect and send it once more.
@@ -269,7 +269,7 @@ class Controller:
 
     def set_mode(self, mode: str, timeout: float = 10.0) -> dict:
         """Switch the USB personality: "pad", "kbm" (keyboard+mouse), "keyboard" or "mouse".
-        The ESP32 restarts and the Switch sees the old device unplugged and the new one plugged in."""
+        The ESP32 restarts and the target sees the old device unplugged and the new one plugged in."""
         name = MODE_ALIASES.get(mode.strip().lower(), mode.strip().lower())
         if name not in MODES:
             raise ValueError(f"unknown mode {mode!r}; one of {list(MODES)}")
@@ -356,7 +356,7 @@ class Controller:
             time.sleep(after)
 
     def type_text(self, text: str, interval: float = 0.03) -> None:
-        """Type ASCII text ("\n" = Enter). Layout follows S2H_KEYBOARD_LAYOUT (us / jis)."""
+        """Type ASCII text ("\n" = Enter). Layout follows HWH_KEYBOARD_LAYOUT (us / jis)."""
         strokes = [kb.char_to_key(ch) for ch in text]  # validate everything before typing
         for mods, usage in strokes:
             self.key_down(mods, [usage])

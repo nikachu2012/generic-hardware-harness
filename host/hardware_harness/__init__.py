@@ -1,4 +1,4 @@
-"""Switch 2 harness: ESP32-S3 gamepad bridge + capture card."""
+"""Generic hardware harness: ESP32-S3 USB HID bridge + capture card."""
 from .controller import Controller
 from .capture import Capture
 

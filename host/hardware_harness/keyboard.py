@@ -53,7 +53,7 @@ _COMMON = {
 
 
 def layout() -> str:
-    return os.environ.get("S2H_KEYBOARD_LAYOUT", "us").lower()
+    return os.environ.get("HWH_KEYBOARD_LAYOUT", "us").lower()
 
 
 def char_to_key(ch: str, layout_name: str | None = None) -> tuple[int, int]:

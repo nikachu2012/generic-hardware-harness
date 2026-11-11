@@ -1,7 +1,7 @@
 """Browser live view for the MCP server: MJPEG stream of the screen plus a log of agent actions.
 
 Runs inside the MCP server process because that process owns the capture card and the
-serial port. Open http://127.0.0.1:8765 (env S2H_VIEW_PORT, 0 disables it).
+serial port. Open http://127.0.0.1:8765 (env HWH_VIEW_PORT, 0 disables it).
 """
 
 from __future__ import annotations
@@ -35,7 +35,7 @@ def events_since(after: int) -> list[dict]:
 PAGE = """<!doctype html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Switch 2 Live</title>
+<title>Hardware Harness Live</title>
 <style>
 :root { --bg:#111; --fg:#ddd; --dim:#888; --accent:#e60012; --panel:#1b1b1b; --err:#ff6b6b; }
 * { box-sizing: border-box; }
@@ -56,9 +56,9 @@ header b { color:var(--accent); }
 @media (max-width: 800px) { body { flex-direction:column; height:auto; } aside { width:auto; height:50vh; } }
 </style></head>
 <body>
-<div id="screen"><img src="/stream" alt="Switch 2 screen"></div>
+<div id="screen"><img src="/stream" alt="device screen"></div>
 <aside>
-  <header><b>Switch 2</b> live · <span id="last">waiting for agent…</span>
+  <header><b>Hardware Harness</b> live · <span id="last">waiting for agent…</span>
     <div id="state"></div></header>
   <div id="log"></div>
 </aside>
@@ -155,5 +155,5 @@ def start(port: int, get_jpeg: Callable[[], bytes], get_state: Callable[[], str]
     srv = ThreadingHTTPServer(("127.0.0.1", port), Handler)
     srv.daemon_threads = True
     threading.Thread(target=srv.serve_forever, daemon=True).start()
-    print(f"switch2 live view: http://127.0.0.1:{port}", file=sys.stderr)
+    print(f"hardware-harness live view: http://127.0.0.1:{port}", file=sys.stderr)
     return srv

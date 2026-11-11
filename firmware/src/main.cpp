@@ -1,6 +1,6 @@
-// Switch 2 controller bridge for ESP32-S3.
+// Generic USB HID (gamepad / keyboard / mouse) bridge for ESP32-S3.
 //
-//   Native USB (OTG)  -> Nintendo Switch 2. What it enumerates as depends on the mode:
+//   Native USB (OTG)  -> target device (game console, PC, ...). What it enumerates as depends on the mode:
 //                          0 pad       HORIPAD-compatible wired gamepad (VID 0F0D / PID 0092)
 //                          1 kbm       keyboard (report ID 1) + mouse (report ID 2)
 //                          2 keyboard  boot-style keyboard only (no report IDs)
@@ -57,7 +57,7 @@ enum Mode : uint32_t { kModePad = 0, kModeKbm = 1, kModeKeyboard = 2, kModeMouse
 static const char *const kModeNames[] = {"pad", "kbm", "keyboard", "mouse"};
 
 // Survives ESP.restart() but not a power cycle, so a cold boot always comes up as a gamepad.
-static const uint32_t kModeMagic = 0x5332484D;  // "S2HM"
+static const uint32_t kModeMagic = 0x4857484D;  // "HWHM"
 RTC_NOINIT_ATTR static uint32_t g_modeMagic;
 RTC_NOINIT_ATTR static uint32_t g_modeNext;
 static Mode g_mode = kModePad;
@@ -271,9 +271,9 @@ void setup() {
   } else {
     USB.VID(0x303A);  // Espressif
     USB.PID(0x8100 + g_mode);
-    USB.manufacturerName("switch2-harness");
-    USB.productName(g_mode == kModeKbm ? "S2H Keyboard Mouse"
-                    : g_mode == kModeKeyboard ? "S2H Keyboard" : "S2H Mouse");
+    USB.manufacturerName("hardware-harness");
+    USB.productName(g_mode == kModeKbm ? "HWH Keyboard Mouse"
+                    : g_mode == kModeKeyboard ? "HWH Keyboard" : "HWH Mouse");
     if (g_mode == kModeKbm) {
       keyboard.begin(kKeyboardDescId, sizeof(kKeyboardDescId), kIdKeyboard);
       mouse.begin(kMouseDescId, sizeof(kMouseDescId), kIdMouse);
@@ -286,7 +286,7 @@ void setup() {
   HID.begin();
   USB.begin();
 
-  Serial.printf("READY switch2-bridge mode=%s\n", kModeNames[g_mode]);
+  Serial.printf("READY hwh-bridge mode=%s\n", kModeNames[g_mode]);
 }
 
 void loop() {
